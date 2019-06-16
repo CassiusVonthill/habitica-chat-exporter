@@ -1,9 +1,7 @@
 package main
 
-import "fmt"
-
 func main() {
-	fmt.Println(GetGuildMessages("party"))
+	GetGuildMessages("party")
 }
 
 func helloWorld() string {

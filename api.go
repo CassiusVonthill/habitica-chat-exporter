@@ -8,20 +8,22 @@ import (
 	"time"
 )
 
-// Date represents an imprecise date.
-//type Date struct {
-//	Year  int
-//	Month time.Month
-//	Day int
-//
-//}
-
 type Message struct {
-	ID        string
-	Timestamp time.Time
+	Text      string `json:"text"`
+	Timestamp int64  `json:"timestamp"`
+	User      string `json:"user,omitempty"`
+	UserName  string `json:"username,omitempty"`
 }
 
-func GetGuildMessages(guildId string) (result map[string]interface{}) {
+type MessageResponse struct {
+	Version       string    `json:"appVersion"`
+	Data          []Message `json:"data"`
+	Notifications []byte    `json:"-"`
+	Success       bool      `json:"success"`
+	UserV         int       `json:"-"`
+}
+
+func GetGuildMessages(guildId string) {
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -35,14 +37,17 @@ func GetGuildMessages(guildId string) (result map[string]interface{}) {
 	req.Header.Add("x-api-user", "INSERT_API_ID_HERE")
 	req.Header.Add("x-api-key", "INSERT_API_KEY_HERE")
 
-	resp, err := client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	var result MessageResponse
+	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fmt.Println(result.Data[0])
 	return
 }
